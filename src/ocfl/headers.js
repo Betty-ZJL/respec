@@ -46,9 +46,9 @@ import { ISODate } from "../core/utils.js";
 import headersTmpl from "./templates/headers.js";
 import { pub } from "../core/pubsubhub.js";
 
-export const name = "dini/headers";
+export const name = "ocfl/headers";
 
-const DINIDate = new Intl.DateTimeFormat(["de-DE"], {
+const DINIDate = new Intl.DateTimeFormat(["en-US"], {
   timeZone: "UTC",
   year: "numeric",
   month: "long",
@@ -56,8 +56,8 @@ const DINIDate = new Intl.DateTimeFormat(["de-DE"], {
 });
 
 const status2text = {
-  unofficial: "Entwurf vom",
-  base: "Spezifikation vom",
+  unofficial: "Draft",
+  base: "Specification",
 };
 
 /**
