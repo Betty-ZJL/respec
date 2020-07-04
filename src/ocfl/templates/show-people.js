@@ -44,8 +44,12 @@ export default (items = []) => {
   function getItem(p) {
     const personName = [p.name]; // treated as opt-in HTML by hyperHTML
     const company = [p.company];
+    const editorid = p.w3cid ? parseInt(p.w3cid, 10) : null;
     /** @type {HTMLElement} */
-    const dd = html`<dd class="p-author h-card vcard"></dd>`;
+    const dd = html`<dd
+      class="p-author h-card vcard"
+      data-editor-id="${editorid}"
+    ></dd>`;
     const span = document.createDocumentFragment();
     const contents = [];
     if (p.mailto) {

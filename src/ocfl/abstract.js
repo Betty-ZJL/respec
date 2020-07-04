@@ -1,9 +1,9 @@
 // @ts-check
-// Module dini/abstract
+// Module w3c/abstract
 // Handle the abstract section properly.
 import { getIntlData } from "../core/utils.js";
 import { pub } from "../core/pubsubhub.js";
-export const name = "dini/abstract";
+export const name = "ocfl/abstract";
 
 const localizationStrings = {
   en: {

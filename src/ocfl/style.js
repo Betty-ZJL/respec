@@ -1,13 +1,13 @@
 // @ts-check
 /* jshint strict: true, browser:true, jquery: true */
-// Module dini/style
+// Module w3c/style
 // Inserts a link to the appropriate W3C style for the specification's maturity level.
 // CONFIGURATION
 //  - specStatus: the short code for the specification's maturity level or type (required)
 
 import { createResourceHint, linkCSS, toKeyValuePairs } from "../core/utils.js";
 import { pub, sub } from "../core/pubsubhub.js";
-export const name = "dini/style";
+export const name = "ocfl/style";
 function attachFixupScript(doc, version) {
   const script = doc.createElement("script");
   if (location.hash) {
@@ -50,6 +50,21 @@ function createBaseStyle() {
   return link;
 }
 
+function selectStyleVersion(styleVersion) {
+  let version = "";
+  switch (styleVersion) {
+    case null:
+    case true:
+      version = "2016";
+      break;
+    default:
+      if (styleVersion && !isNaN(styleVersion)) {
+        version = styleVersion.toString().trim();
+      }
+  }
+  return version;
+}
+
 function createResourceHints() {
   const resourceHints = [
     {
@@ -65,7 +80,7 @@ function createResourceHints() {
       hint: "preload", // all specs include on base.css.
       href: "https://www.w3.org/StyleSheets/TR/2016/base.css",
       as: "style",
-    },
+    }
   ]
     .map(createResourceHint)
     .reduce((frag, link) => {
@@ -100,29 +115,52 @@ export function run(conf) {
     pub("warn", warn);
   }
 
-  let styleFile = "";
+  let styleFile = "W3C-";
 
   // Figure out which style file to use.
   switch (conf.specStatus.toUpperCase()) {
-    case "UNOFFICIAL":
-      styleFile = "W3C-UD";
+    case "CG-DRAFT":
+    case "CG-FINAL":
+    case "BG-DRAFT":
+    case "BG-FINAL":
+      styleFile = conf.specStatus.toLowerCase();
       break;
+    case "FPWD":
+    case "LC":
+    case "WD-NOTE":
+    case "LC-NOTE":
+      styleFile += "WD";
+      break;
+    case "WG-NOTE":
+    case "FPWD-NOTE":
+      styleFile += "WG-NOTE.css";
+      break;
+    case "UNOFFICIAL":
+      styleFile += "UD";
+      break;
+    case "FINDING":
+    case "FINDING-DRAFT":
     case "BASE":
       styleFile = "base.css";
       break;
+    default:
+      styleFile += conf.specStatus;
   }
 
+  // Select between released styles and experimental style.
+  const version = selectStyleVersion(conf.useExperimentalStyles || "2016");
   // Attach W3C fixup script after we are done.
-  if (!conf.noToc) {
+  if (version && !conf.noToc) {
     sub(
       "end-all",
       () => {
-        attachFixupScript(document, "2016");
+        attachFixupScript(document, version);
       },
       { once: true }
     );
   }
-  const finalStyleURL = `https://www.w3.org/StyleSheets/TR/2016/${styleFile}`;
+  const finalVersionPath = version ? `${version}/` : "";
+  const finalStyleURL = `https://www.w3.org/StyleSheets/TR/${finalVersionPath}${styleFile}`;
   linkCSS(document, finalStyleURL);
   // Make sure the W3C stylesheet is the last stylesheet, as required by W3C Pub Rules.
   const moveStyle = styleMover(finalStyleURL);

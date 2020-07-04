@@ -1,64 +1,33 @@
 // @ts-check
 /**
- * Sets the defaults for DINI specs
+ * Sets the defaults for W3C specs
  */
-export const name = "dini/defaults";
+export const name = "ocfl/defaults";
 import { coreDefaults } from "../core/defaults.js";
 import linter from "../core/linter.js";
 import { rule as privsecSectionRule } from "../core/linter-rules/privsec-section.js";
+import { rule as wptTestsExist } from "../core/linter-rules/wpt-tests-exist.js";
 
-linter.register(privsecSectionRule);
+linter.register(privsecSectionRule, wptTestsExist);
 
-const licenses = new Map([
-  [
-    "cc0",
-    {
-      name: "Creative Commons 0 Public Domain Dedication",
-      short: "CC0",
-      url: "https://creativecommons.org/publicdomain/zero/1.0/",
-    },
-  ],
-  [
-    "cc-by",
-    {
-      name: "Creative Commons Attribution 4.0 International Public License",
-      short: "CC-BY",
-      url: "https://creativecommons.org/licenses/by/4.0/legalcode",
-    },
-  ],
-  [
-    "cc-by-sa",
-    {
-      name:
-        "Creative Commons Attribution-ShareAlike 4.0 International Public License",
-      short: "CC-BY-SA",
-      url: "https://creativecommons.org/licenses/by-sa/4.0/legalcode",
-    },
-  ],
-]);
+const w3cLogo = {
+  src: "https://www.w3.org/StyleSheets/TR/2016/logos/W3C",
+  alt: "W3C",
+  height: 48,
+  width: 72,
+  url: "https://www.w3.org/",
+};
 
-const diniDefaults = {
-  format: "markdown",
-  isED: false,
-  isNoTrack: true,
-  isPR: false,
+const w3cDefaults = {
   lint: {
     "privsec-section": true,
     "wpt-tests-exist": false,
   },
-  logos: [],
-  prependW3C: false,
   doJsonLd: false,
-  license: "cc-by",
-  shortName: "X",
-  showPreviousVersion: false,
+  license: "w3c-software-doc",
+  logos: [],
+  xref: true,
 };
-
-function computeProps(conf) {
-  return {
-    licenseInfo: licenses.get(conf.license),
-  };
-}
 
 export function run(conf) {
   // assign the defaults
@@ -67,16 +36,17 @@ export function run(conf) {
       ? false
       : {
           ...coreDefaults.lint,
-          ...diniDefaults.lint,
+          ...w3cDefaults.lint,
           ...conf.lint,
         };
+
+  if (conf.specStatus && conf.specStatus.toLowerCase() !== "unofficial") {
+    w3cDefaults.logos.push(w3cLogo);
+  }
   Object.assign(conf, {
     ...coreDefaults,
-    ...diniDefaults,
+    ...w3cDefaults,
     ...conf,
     lint,
   });
-
-  // computed properties
-  Object.assign(conf, computeProps(conf));
 }
