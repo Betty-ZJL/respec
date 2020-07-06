@@ -167,12 +167,6 @@ export default (conf, options) => {
             <dd><a href="${conf.prevED}">${conf.prevED}</a></dd>
           `
         : ""}
-      ${conf.showPreviousVersion
-        ? html`
-            <dt>Previous version:</dt>
-            <dd><a href="${conf.prevVersion}">${conf.prevVersion}</a></dd>
-          `
-        : ""}
       ${!conf.prevRecURI
         ? ""
         : conf.isRec
@@ -211,16 +205,6 @@ export default (conf, options) => {
           Please check the
           <a href="${conf.errata}"><strong>errata</strong></a> for any errors or
           issues reported since publication.
-        </p>`
-      : ""}
-    ${conf.isRec
-      ? html`<p>
-          See also
-          <a
-            href="${`http://www.w3.org/2003/03/Translations/byTechnology?technology=${conf.shortName}`}"
-          >
-            <strong>translations</strong></a
-          >.
         </p>`
       : ""}
     ${conf.alternateFormats
