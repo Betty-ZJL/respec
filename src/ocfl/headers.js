@@ -433,8 +433,8 @@ export function run(conf) {
     conf.showPreviousVersion = conf.previousPublishDate ? true : false;
   conf.notYetRec = conf.isRecTrack && conf.specStatus !== "REC";
   conf.isRec = conf.isRecTrack && conf.specStatus === "REC";
-  if (conf.isRec && !conf.errata)
-    pub("error", "Recommendations must have an errata link.");
+  // if (conf.isRec && !conf.errata)
+  //   pub("error", "Recommendations must have an errata link.");
   conf.prependW3C = !conf.isUnofficial;
   conf.isED = conf.specStatus === "ED";
   conf.isCR = conf.specStatus === "CR";
