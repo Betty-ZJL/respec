@@ -1,6 +1,6 @@
 // @ts-check
 /* jshint strict: true, browser:true, jquery: true */
-// Module w3c/style
+// Module ocfl/style
 // Inserts a link to the appropriate W3C style for the specification's maturity level.
 // CONFIGURATION
 //  - specStatus: the short code for the specification's maturity level or type (required)
@@ -50,21 +50,6 @@ function createBaseStyle() {
   return link;
 }
 
-function selectStyleVersion(styleVersion) {
-  let version = "";
-  switch (styleVersion) {
-    case null:
-    case true:
-      version = "2016";
-      break;
-    default:
-      if (styleVersion && !isNaN(styleVersion)) {
-        version = styleVersion.toString().trim();
-      }
-  }
-  return version;
-}
-
 function createResourceHints() {
   const resourceHints = [
     {
@@ -103,8 +88,8 @@ document.head.prepend(elements);
 
 function styleMover(linkURL) {
   return exportDoc => {
-    const w3cStyle = exportDoc.querySelector(`head link[href="${linkURL}"]`);
-    exportDoc.querySelector("head").append(w3cStyle);
+    const ocflStyle = exportDoc.querySelector(`head link[href="${linkURL}"]`);
+    exportDoc.querySelector("head").append(ocflStyle);
   };
 }
 
@@ -115,54 +100,25 @@ export function run(conf) {
     pub("warn", warn);
   }
 
-  let styleFile = "W3C-";
+  let styleFile = "";
 
   // Figure out which style file to use.
   switch (conf.specStatus.toUpperCase()) {
-    case "CG-DRAFT":
-    case "CG-FINAL":
-    case "BG-DRAFT":
-    case "BG-FINAL":
-      styleFile = conf.specStatus.toLowerCase();
+    case "REC":
+      styleFile = "https://ocfl.io/assets/REC-ocfl.css";
       break;
-    case "FPWD":
-    case "LC":
-    case "WD-NOTE":
-    case "LC-NOTE":
-      styleFile += "WD";
+    case "NOTE":
+      styleFile = "https://ocfl.io/assets/NOTE-ocfl.css";
       break;
-    case "WG-NOTE":
-    case "FPWD-NOTE":
-      styleFile += "WG-NOTE.css";
-      break;
-    case "UNOFFICIAL":
-      styleFile += "UD";
-      break;
-    case "FINDING":
-    case "FINDING-DRAFT":
     case "BASE":
-      styleFile = "base.css";
+      styleFile = "https://ocfl.io/assets/BASE-ocfl.css";
       break;
     default:
       styleFile += conf.specStatus;
   }
 
-  // Select between released styles and experimental style.
-  const version = selectStyleVersion(conf.useExperimentalStyles || "2016");
-  // Attach W3C fixup script after we are done.
-  if (version && !conf.noToc) {
-    sub(
-      "end-all",
-      () => {
-        attachFixupScript(document, version);
-      },
-      { once: true }
-    );
-  }
-  const finalVersionPath = version ? `${version}/` : "";
-  const finalStyleURL = `https://www.w3.org/StyleSheets/TR/${finalVersionPath}${styleFile}`;
-  linkCSS(document, finalStyleURL);
+  linkCSS(document, styleFile);
   // Make sure the W3C stylesheet is the last stylesheet, as required by W3C Pub Rules.
-  const moveStyle = styleMover(finalStyleURL);
+  const moveStyle = styleMover(styleFile);
   sub("beforesave", moveStyle);
 }
